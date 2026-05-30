@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mir Jalees — Site Reliability Engineer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0c0f;
+      --surface: #111418;
+      --border: #1e2530;
+      --accent: #00e5ff;
+      --accent2: #7fff6e;
+      --text: #e8edf5;
+      --muted: #6b7a8d;
+      --card: #13181f;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 14px;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* GRID BACKGROUND */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 48px;
+      background: rgba(10,12,15,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--accent);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--accent); }
+
+    /* HERO */
+    .hero {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 120px 48px 80px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .hero-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: center;
+      width: 100%;
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 4px 14px;
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    .hero-tag .dot {
+      width: 6px;
+      height: 6px;
+      background: var(--accent2);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.7); }
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(42px, 6vw, 72px);
+      font-weight: 800;
+      line-height: 1.0;
+      letter-spacing: -2px;
+      margin-bottom: 8px;
+    }
+
+    h1 .name-accent { color: var(--accent); }
+
+    .hero-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      margin-bottom: 24px;
+    }
+
+    .hero-bio {
+      color: #8a97a8;
+      font-size: 13px;
+      line-height: 1.8;
+      max-width: 480px;
+      margin-bottom: 40px;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 28px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--bg);
+      font-weight: 500;
+    }
+
+    .btn-primary:hover {
+      background: #00c9e0;
+      transform: translateY(-2px);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* STATS PANEL */
+    .hero-stats {
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 40px;
+      position: relative;
+    }
+
+    .hero-stats::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+    }
+
+    .stats-header {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .stats-header::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .stat-row:last-child { border-bottom: none; }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .stat-value {
+      font-family: 'Syne', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--accent2);
+    }
+
+    .stat-sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+    /* SECTIONS */
+    section {
+      position: relative;
+      z-index: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 80px 48px;
+    }
+
+    .section-label {
+      font-size: 10px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 48px;
+      line-height: 1.1;
+    }
+
+    /* SKILLS */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 2px;
+    }
+
+    .skill-group {
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 28px;
+      transition: border-color 0.2s;
+    }
+
+    .skill-group:hover { border-color: var(--accent); }
+
+    .skill-group-title {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    .skill-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag {
+      background: rgba(0,229,255,0.06);
+      border: 1px solid rgba(0,229,255,0.15);
+      color: #8ac6d0;
+      padding: 4px 10px;
+      font-size: 11px;
+      letter-spacing: 0.05em;
+    }
+
+    /* EXPERIENCE */
+    .timeline {
+      position: relative;
+      padding-left: 24px;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 8px;
+      bottom: 8px;
+      width: 1px;
+      background: linear-gradient(180deg, var(--accent), transparent);
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: 56px;
+    }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -28px;
+      top: 8px;
+      width: 8px;
+      height: 8px;
+      border: 1px solid var(--accent);
+      background: var(--accent);
+      transform: rotate(45deg);
+    }
+
+    .job-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 4px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .job-company {
+      font-family: 'Syne', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .job-period {
+      font-size: 11px;
+      color: var(--accent2);
+      letter-spacing: 0.1em;
+      white-space: nowrap;
+      margin-top: 6px;
+    }
+
+    .job-role {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+
+    .job-points {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .job-points li {
+      font-size: 13px;
+      color: #8a97a8;
+      padding-left: 16px;
+      position: relative;
+      line-height: 1.7;
+    }
+
+    .job-points li::before {
+      content: '▸';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-size: 10px;
+      top: 3px;
+    }
+
+    .highlight {
+      color: var(--accent2);
+      font-weight: 500;
+    }
+
+    /* INCIDENTS */
+    .incidents-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 16px;
+    }
+
+    .incident-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 24px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .incident-card:hover {
+      border-color: var(--accent2);
+      transform: translateY(-3px);
+    }
+
+    .incident-icon {
+      font-size: 20px;
+      margin-bottom: 12px;
+    }
+
+    .incident-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+
+    .incident-desc {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    /* CERTS */
+    .certs-row {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .cert-card {
+      flex: 1;
+      min-width: 240px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 28px 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      transition: border-color 0.2s;
+    }
+
+    .cert-card:hover { border-color: var(--accent); }
+
+    .cert-badge {
+      font-size: 28px;
+      flex-shrink: 0;
+    }
+
+    .cert-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .cert-year {
+      font-size: 11px;
+      color: var(--accent2);
+      letter-spacing: 0.1em;
+    }
+
+    /* CONTACT */
+    .contact-section {
+      background: var(--card);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      text-align: center;
+    }
+
+    .contact-links {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+      margin-top: 32px;
+    }
+
+    .contact-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 12px;
+      letter-spacing: 0.05em;
+      padding: 12px 20px;
+      border: 1px solid var(--border);
+      transition: all 0.2s;
+    }
+
+    .contact-link:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    /* FOOTER */
+    footer {
+      text-align: center;
+      padding: 32px 48px;
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* FADE IN */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* DIVIDER */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+      margin: 0 48px;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      nav { padding: 16px 24px; }
+      .nav-links { display: none; }
+      .hero, section { padding-left: 24px; padding-right: 24px; }
+      .hero-inner { grid-template-columns: 1fr; gap: 40px; }
+      .hero-stats { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-logo">MJ.SRE</div>
+    <ul class="nav-links">
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#experience">Experience</a></li>
+      <li><a href="#incidents">Incidents</a></li>
+      <li><a href="#certs">Certs</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-inner">
+      <div>
+        <div class="hero-tag">
+          <span class="dot"></span>
+          Available · Bengaluru, India
+        </div>
+        <h1>Mir<br><span class="name-accent">Jalees</span></h1>
+        <p class="hero-title">Site Reliability Engineer</p>
+        <p class="hero-bio">
+          SRE with 4+ years of reliability engineering and 6+ years across infrastructure and systems. Specializing in distributed systems on GCP and Kubernetes — keeping things running, observable, and automated.
+        </p>
+        <div class="hero-cta">
+          <a href="mailto:jalees01hassan@gmail.com" class="btn btn-primary">Get in Touch</a>
+          <a href="https://github.com/OpswhizMir" target="_blank" class="btn btn-ghost">GitHub ↗</a>
+          <a href="https://linkedin.com/in/mir-jalees-56059813a" target="_blank" class="btn btn-ghost">LinkedIn ↗</a>
+        </div>
+      </div>
+
+      <div class="hero-stats">
+        <div class="stats-header">System Metrics</div>
+        <div class="stat-row">
+          <div>
+            <div class="stat-label">Uptime Improvement</div>
+            <div class="stat-sub">99.3% → 99.9%</div>
+          </div>
+          <div class="stat-value">+0.6%</div>
+        </div>
+        <div class="stat-row">
+          <div>
+            <div class="stat-label">MTTR Reduction</div>
+            <div class="stat-sub">Structured RCA + alerting</div>
+          </div>
+          <div class="stat-value">~30%</div>
+        </div>
+        <div class="stat-row">
+          <div>
+            <div class="stat-label">Manual Ops Reduced</div>
+            <div class="stat-sub">Automation via GH Actions</div>
+          </div>
+          <div class="stat-value">40%</div>
+        </div>
+        <div class="stat-row">
+          <div>
+            <div class="stat-label">Critical Vulns Reduced</div>
+            <div class="stat-sub">GCP + Wiz integration</div>
+          </div>
+          <div class="stat-value">~40%</div>
+        </div>
+        <div class="stat-row">
+          <div>
+            <div class="stat-label">MTTD Improvement</div>
+            <div class="stat-sub">Panther SIEM + Audit Logs</div>
+          </div>
+          <div class="stat-value">~25%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- SKILLS -->
+  <section id="skills" class="fade-in">
+    <p class="section-label">// Technical Stack</p>
+    <h2>Skills & Tools</h2>
+    <div class="skills-grid">
+      <div class="skill-group">
+        <div class="skill-group-title">Cloud Platforms</div>
+        <div class="skill-tags">
+          <span class="tag">GCP</span>
+          <span class="tag">GKE</span>
+          <span class="tag">AWS EC2</span>
+          <span class="tag">EKS</span>
+          <span class="tag">Lambda</span>
+          <span class="tag">IAM</span>
+          <span class="tag">Route 53</span>
+          <span class="tag">CloudWatch</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <div class="skill-group-title">Orchestration & GitOps</div>
+        <div class="skill-tags">
+          <span class="tag">Kubernetes</span>
+          <span class="tag">FluxCD</span>
+          <span class="tag">Docker</span>
+          <span class="tag">Podman</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <div class="skill-group-title">IaC & Config</div>
+        <div class="skill-tags">
+          <span class="tag">Terraform</span>
+          <span class="tag">Ansible</span>
+          <span class="tag">SaltStack</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <div class="skill-group-title">CI/CD</div>
+        <div class="skill-tags">
+          <span class="tag">GitHub Actions</span>
+          <span class="tag">Octopus Deploy</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <div class="skill-group-title">Observability</div>
+        <div class="skill-tags">
+          <span class="tag">OpenTelemetry</span>
+          <span class="tag">SignalFX</span>
+          <span class="tag">Site24x7</span>
+          <span class="tag">OpenSearch</span>
+          <span class="tag">Graylog</span>
+          <span class="tag">Panther SIEM</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <div class="skill-group-title">Incident Management</div>
+        <div class="skill-tags">
+          <span class="tag">Firehydrant</span>
+          <span class="tag">OpsGenie</span>
+          <span class="tag">ServiceNow</span>
+          <span class="tag">JIRA</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <div class="skill-group-title">Operating Systems</div>
+        <div class="skill-tags">
+          <span class="tag">RHEL 8</span>
+          <span class="tag">Debian 11</span>
+          <span class="tag">CentOS</span>
+          <span class="tag">Oracle Linux</span>
+          <span class="tag">Windows Server</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <div class="skill-group-title">Scripting & Other</div>
+        <div class="skill-tags">
+          <span class="tag">Python</span>
+          <span class="tag">Bash</span>
+          <span class="tag">Git</span>
+          <span class="tag">VMware vSphere</span>
+          <span class="tag">Apache Solr</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- EXPERIENCE -->
+  <section id="experience" class="fade-in">
+    <p class="section-label">// Work History</p>
+    <h2>Experience</h2>
+    <div class="timeline">
+
+      <div class="timeline-item">
+        <div class="job-header">
+          <div class="job-company">Diligent Corporation</div>
+          <div class="job-period">MAR 2022 – PRESENT</div>
+        </div>
+        <div class="job-role">Site Reliability Engineer · Bangalore, India</div>
+        <ul class="job-points">
+          <li>Led GitOps platform upgrades migrating <span class="highlight">FluxCD</span> across multiple Kubernetes clusters — zero deployment disruption.</li>
+          <li>Built security observability pipelines integrating <span class="highlight">GCP Audit Logs → Panther SIEM</span>, reducing MTTD by ~25%.</li>
+          <li>Improved production uptime from <span class="highlight">99.3% → 99.9%</span> via proactive monitoring with Site24x7, SignalFx, and OpenTelemetry.</li>
+          <li>Reduced MTTR by <span class="highlight">~30%</span> through structured RCA, improved alerting, and real-time dashboards.</li>
+          <li>Automated deployment, monitoring, and OS migration workflows — cutting manual operational effort by <span class="highlight">40%</span>.</li>
+          <li>Reduced critical vulnerabilities by <span class="highlight">~40%</span> via GCP-native + Wiz integration for risk prioritization.</li>
+          <li>Executed large-scale OS migrations: <span class="highlight">CentOS → RHEL</span> and <span class="highlight">Debian 9 → 11</span>, plus Kubernetes cluster upgrades.</li>
+          <li>Defined and tracked SLIs and SLAs to measure reliability and ensure compliance.</li>
+        </ul>
+      </div>
+
+      <div class="timeline-item">
+        <div class="job-header">
+          <div class="job-company">Cerner Corporation</div>
+          <div class="job-period">OCT 2019 – MAR 2022</div>
+        </div>
+        <div class="job-role">System Engineer · Bangalore, India</div>
+        <ul class="job-points">
+          <li>Administered and hardened <span class="highlight">100+ Oracle Enterprise Linux servers</span>, reducing unplanned downtime by 20%.</li>
+          <li>Reduced repeat incidents by <span class="highlight">15%</span> through structured root cause analysis.</li>
+          <li>Executed domain refreshes and replications with <span class="highlight">100% data consistency</span> — zero data loss events.</li>
+          <li>Performed P2V migrations for production environments, improving resource utilization by <span class="highlight">~30%</span>.</li>
+        </ul>
+      </div>
+
+      <div class="timeline-item">
+        <div class="job-header">
+          <div class="job-company">McAfee LLC</div>
+          <div class="job-period">OCT 2018 – SEP 2019</div>
+        </div>
+        <div class="job-role">Trainee Engineer · Bangalore, India</div>
+        <ul class="job-points">
+          <li>Supported enterprise deployments of McAfee security products for <span class="highlight">50+ enterprise clients</span>.</li>
+          <li>Automated policy creation workflows — reducing manual setup time by <span class="highlight">25%</span>.</li>
+          <li>Achieved <span class="highlight">95%+ first-contact resolution rate</span> through remote troubleshooting and guided remediation.</li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- INCIDENTS -->
+  <section id="incidents" class="fade-in">
+    <p class="section-label">// Incident Engineering</p>
+    <h2>Key Incident Resolutions</h2>
+    <div class="incidents-grid">
+      <div class="incident-card">
+        <div class="incident-icon">🔴</div>
+        <div class="incident-title">Redis Cluster Failure</div>
+        <div class="incident-desc">Identified stale PID file blocking Redis master restart (~5K+ hash slots unavailable). Restored cluster health and eliminated HTTP 500 errors at the application layer.</div>
+      </div>
+      <div class="incident-card">
+        <div class="incident-icon">🔧</div>
+        <div class="incident-title">CI/CD Pipeline Failure</div>
+        <div class="incident-desc">Diagnosed GitHub credential expiration impacting preview deployments. Restored pipeline by updating PAT and refreshing configuration via SaltStack.</div>
+      </div>
+      <div class="incident-card">
+        <div class="incident-icon">💾</div>
+        <div class="incident-title">RabbitMQ Disk Exhaustion</div>
+        <div class="incident-desc">Diagnosed Mnesia corruption due to ENOSPC storage exhaustion. Restored message processing and stabilized queue operation.</div>
+      </div>
+      <div class="incident-card">
+        <div class="incident-icon">📡</div>
+        <div class="incident-title">Observability Pipeline Failure</div>
+        <div class="incident-desc">Identified missing proxy configuration blocking OpenTelemetry → SignalFx telemetry export. Fixed environment-level proxy settings to restore monitoring data flow.</div>
+      </div>
+      <div class="incident-card">
+        <div class="incident-icon">🌐</div>
+        <div class="incident-title">Nginx 400 Errors</div>
+        <div class="incident-desc">Identified oversized request headers/cookies as root cause impacting user access. Implemented cache/DNS clearing and request handling optimization.</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- CERTS -->
+  <section id="certs" class="fade-in">
+    <p class="section-label">// Credentials</p>
+    <h2>Certifications</h2>
+    <div class="certs-row">
+      <div class="cert-card">
+        <div class="cert-badge">⎈</div>
+        <div>
+          <div class="cert-name">Certified Kubernetes Administrator</div>
+          <div class="cert-year">CKA · 2024</div>
+        </div>
+      </div>
+      <div class="cert-card">
+        <div class="cert-badge">🎩</div>
+        <div>
+          <div class="cert-name">Red Hat Certified Systems Administrator</div>
+          <div class="cert-year">RHCSA · 2023</div>
+        </div>
+      </div>
+      <div class="cert-card">
+        <div class="cert-badge">☁️</div>
+        <div>
+          <div class="cert-name">AWS Solutions Architect Associate</div>
+          <div class="cert-year">SAA-C02 · 2022</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top: 48px;">
+      <p class="section-label">// Community</p>
+      <h2 style="font-size: 28px; margin-bottom: 24px;">Open Source & Conferences</h2>
+      <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+        <div class="cert-card">
+          <div class="cert-badge">🐧</div>
+          <div>
+            <div class="cert-name">KubeCon 2023, Shanghai</div>
+            <div class="cert-year" style="color: var(--muted);">The Linux Foundation Open-Source Summit Asia</div>
+          </div>
+        </div>
+        <div class="cert-card">
+          <div class="cert-badge">🤝</div>
+          <div>
+            <div class="cert-name">Open-Source Contributor</div>
+            <div class="cert-year" style="color: var(--muted);">wemakedevs · thealphadev communities</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="contact-section fade-in">
+    <p class="section-label">// Let's connect</p>
+    <h2>Get In Touch</h2>
+    <p style="color: var(--muted); font-size: 13px; max-width: 480px; margin: 0 auto;">
+      Open to interesting SRE and platform engineering opportunities. Feel free to reach out.
+    </p>
+    <div class="contact-links">
+      <a href="mailto:jalees01hassan@gmail.com" class="contact-link">✉ jalees01hassan@gmail.com</a>
+      <a href="https://github.com/OpswhizMir" target="_blank" class="contact-link">⬡ github.com/OpswhizMir</a>
+      <a href="https://linkedin.com/in/mir-jalees-56059813a" target="_blank" class="contact-link">in linkedin.com/in/mir-jalees</a>
+      <a href="tel:+918082077896" class="contact-link">✆ +91 80820 77896</a>
+    </div>
+  </section>
+
+  <footer>
+    <p>© 2025 Mir Jalees · Built with HTML/CSS · Hosted on GitHub Pages</p>
+  </footer>
+
+  <script>
+    // Intersection Observer for fade-in
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>
